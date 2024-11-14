@@ -1,0 +1,108 @@
+package com.cricket.ncasports.service;
+
+import com.cricket.ncasports.dto.MatchDTO;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.model.Player;
+import com.cricket.ncasports.model.Tournament;
+import com.cricket.ncasports.repository.MatchRepository;
+import com.cricket.ncasports.repository.PlayerRepository;
+import com.cricket.ncasports.repository.TournamentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class MatchService {
+
+    private final MatchRepository matchRepository;
+    private final TournamentRepository tournamentRepository;
+    private final PlayerRepository playerRepository;  // Assuming you have a PlayerRepository to fetch players
+
+    @Autowired
+    public MatchService(MatchRepository matchRepository, TournamentRepository tournamentRepository, PlayerRepository playerRepository) {
+        this.matchRepository = matchRepository;
+        this.tournamentRepository = tournamentRepository;
+        this.playerRepository = playerRepository;
+    }
+
+    // Get all matches as MatchDTO
+    public List<MatchDTO> getAllMatchesAsDTO() {
+        return matchRepository.findAll().stream()
+                .map(this::convertToMatchDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Get match by ID
+    public Optional<MatchDTO> getMatchById(Long id) {
+        Optional<Match> match = matchRepository.findById(id);
+        return match.map(this::convertToMatchDTO);
+    }
+
+    // Create a new match and return MatchDTO
+    public MatchDTO createMatch(MatchDTO matchDTO) {
+        // Fetch tournament
+        Optional<Tournament> tournament = tournamentRepository.findById(matchDTO.getTournamentId());
+        if (tournament.isEmpty()) {
+            throw new IllegalArgumentException("Tournament with ID " + matchDTO.getTournamentId() + " not found.");
+        }
+
+        // Create a new Match object
+        Match match = new Match();
+        match.setTeamA(matchDTO.getTeamA());
+        match.setTeamB(matchDTO.getTeamB());
+        match.setScheduledDate(matchDTO.getScheduledDate());
+        match.setTournament(tournament.get());
+
+        // Set player lineups from the MatchDTO (using player IDs)
+        List<Player> teamABatsmen = playerRepository.findAllById(matchDTO.getTeamABatsmen());
+        List<Player> teamBBatsmen = playerRepository.findAllById(matchDTO.getTeamBBatsmen());
+        List<Player> teamABowlers = playerRepository.findAllById(matchDTO.getTeamABowlers());
+        List<Player> teamBBowlers = playerRepository.findAllById(matchDTO.getTeamBBowlers());
+
+        match.setTeamABatsmen(teamABatsmen);
+        match.setTeamBBatsmen(teamBBatsmen);
+        match.setTeamABowlers(teamABowlers);
+        match.setTeamBBowlers(teamBBowlers);
+
+        // Set toss info
+        match.setTossWinner(matchDTO.getTossWinner());
+        match.setTossDecision(matchDTO.getTossDecision());
+
+        match = matchRepository.save(match); // Save the match
+
+        return convertToMatchDTO(match); // Convert to DTO and return
+    }
+
+    // Delete match by ID
+    public void deleteMatch(Long id) {
+        matchRepository.deleteById(id);
+    }
+
+    // Convert Match entity to MatchDTO
+    public MatchDTO convertToMatchDTO(Match match) {
+        MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setId(match.getId());
+        matchDTO.setTeamA(match.getTeamA());
+        matchDTO.setTeamB(match.getTeamB());
+        matchDTO.setScheduledDate(match.getScheduledDate());
+        matchDTO.setTossWinner(match.getTossWinner());
+        matchDTO.setTossDecision(match.getTossDecision());
+
+        // Set the player IDs in the DTO (you can choose to return player details instead of IDs)
+        matchDTO.setTeamABatsmen(match.getTeamABatsmen().stream().map(Player::getId).collect(Collectors.toList()));
+        matchDTO.setTeamBBatsmen(match.getTeamBBatsmen().stream().map(Player::getId).collect(Collectors.toList()));
+        matchDTO.setTeamABowlers(match.getTeamABowlers().stream().map(Player::getId).collect(Collectors.toList()));
+        matchDTO.setTeamBBowlers(match.getTeamBBowlers().stream().map(Player::getId).collect(Collectors.toList()));
+
+        // Tournament info
+        if (match.getTournament() != null) {
+            matchDTO.setTournamentId(match.getTournament().getId());
+            matchDTO.setTournamentName(match.getTournament().getName());
+        }
+
+        return matchDTO;
+    }
+}

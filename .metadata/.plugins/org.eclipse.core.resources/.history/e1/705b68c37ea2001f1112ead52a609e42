@@ -1,0 +1,23 @@
+package com.cricket.ncasports.dto;
+
+import com.cricket.ncasports.model.Role;
+
+public class PlayerRoleDTO {
+    private String playerName;
+    private Role  role;
+	
+	public String getPlayerName() {
+		return playerName;
+	}
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
+	}
+	public Role getRole() {
+		return role;
+	}
+	public void setRole(Role role) {
+		this.role = role;
+	}
+    
+    
+}

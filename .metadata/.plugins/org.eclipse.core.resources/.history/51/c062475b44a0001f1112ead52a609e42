@@ -1,0 +1,90 @@
+package com.cricket.ncasports.service;
+
+import com.cricket.ncasports.dto.ScoreDTO;
+import com.cricket.ncasports.mapper.ScoreMapper;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.model.Score;
+import com.cricket.ncasports.repository.MatchRepository;
+import com.cricket.ncasports.repository.ScoreRepository;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ScoreService {
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
+
+    @Autowired
+    private ScoreUpdateService scoreUpdateService;
+
+    @Autowired
+    private ScoreMapper scoreMapper;
+
+    // Create new score
+    public ScoreDTO createScore(ScoreDTO scoreDTO) {
+        Match match = matchRepository.findById(scoreDTO.getMatchId())
+                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+        Score score = new Score();
+        score.setMatch(match);
+        score.setTeamAScore(scoreDTO.getTeamAScore());
+        score.setTeamBScore(scoreDTO.getTeamBScore());
+        score.setWinner(scoreDTO.getWinner());
+
+        score = scoreRepository.save(score);
+
+        // Use convertToScoreDTO to create the ScoreDTO
+        ScoreDTO createdScoreDTO = convertToScoreDTO(score);
+
+        // Send the score update to WebSocket topic
+        scoreUpdateService.sendScoreUpdate(createdScoreDTO);
+
+        return createdScoreDTO;
+    }
+
+    // Update score for a specific match
+    public ScoreDTO updateScore(ScoreDTO scoreDTO) {
+        // Find the match by matchId
+        Match match = matchRepository.findById(scoreDTO.getMatchId())
+                .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+        // Find the score entry by the match
+        Score score = scoreRepository.findByMatch(match)
+                .orElseThrow(() -> new IllegalArgumentException("Score not found"));
+
+        // Update only score details; do not modify teamA and teamB since they come from Match
+        score.setTeamAScore(scoreDTO.getTeamAScore());
+        score.setTeamBScore(scoreDTO.getTeamBScore());
+        score.setWinner(scoreDTO.getWinner());
+
+        // Save updated score
+        score = scoreRepository.save(score);
+
+        // Use convertToScoreDTO to create the updated ScoreDTO
+        ScoreDTO updatedScoreDTO = convertToScoreDTO(score);
+
+        // Send the score update to WebSocket topic
+        scoreUpdateService.sendScoreUpdate(updatedScoreDTO);
+
+        return updatedScoreDTO;
+    }
+
+    // Convert Score entity to ScoreDTO
+    private ScoreDTO convertToScoreDTO(Score score) {
+        ScoreDTO scoreDTO = new ScoreDTO();
+        scoreDTO.setMatchId(score.getMatch().getId());
+        scoreDTO.setTeamA(score.getMatch().getTeamA());  // Set teamA from the match
+        scoreDTO.setTeamB(score.getMatch().getTeamB());  // Set teamB from the match
+        scoreDTO.setTeamAScore(score.getTeamAScore());
+        scoreDTO.setTeamBScore(score.getTeamBScore());
+        scoreDTO.setWinner(score.getWinner());
+        return scoreDTO;
+    }
+}

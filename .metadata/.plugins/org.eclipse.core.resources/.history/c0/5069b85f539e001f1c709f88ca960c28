@@ -1,0 +1,39 @@
+package com.cricket.ncasports.service;
+
+import com.cricket.ncasports.dto.MatchDTO;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.repository.MatchRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MatchService {
+
+    private final MatchRepository matchRepository;
+
+    @Autowired
+    public MatchService(MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
+    }
+
+    // Other methods...
+
+    public MatchDTO createMatch(Match match) {
+        // Save the match entity to the database
+        Match savedMatch = matchRepository.save(match);
+        
+        // Convert and return the saved match as MatchDTO
+        return convertToMatchDTO(savedMatch);
+    }
+
+    private MatchDTO convertToMatchDTO(Match match) {
+        MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setId(match.getId());
+        matchDTO.setTeamA(match.getTeamA());
+        matchDTO.setTeamB(match.getTeamB());
+        matchDTO.setScheduledDate(match.getScheduledDate());
+        matchDTO.setTournamentId(match.getTournament().getId());
+        matchDTO.setTournamentName(match.getTournament().getName());
+        return matchDTO;
+    }
+}

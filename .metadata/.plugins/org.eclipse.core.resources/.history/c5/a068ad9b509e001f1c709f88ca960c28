@@ -1,0 +1,51 @@
+package com.cricket.ncasports.controller;
+
+import com.cricket.ncasports.dto.MatchDTO;
+import com.cricket.ncasports.service.MatchService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/matches")
+public class MatchController {
+
+    private final MatchService matchService;
+
+    @Autowired
+    public MatchController(MatchService matchService) {
+        this.matchService = matchService;
+    }
+
+    // Get all matches as MatchDTO
+    @GetMapping
+    public List<MatchDTO> getAllMatches() {
+        return matchService.getAllMatchesAsDTO(); // Use the service method to get MatchDTOs
+    }
+
+    // Get match by ID as MatchDTO
+    @GetMapping("/{id}")
+    public ResponseEntity<MatchDTO> getMatchById(@PathVariable Long id) {
+        Optional<MatchDTO> matchDTO = matchService.getMatchById(id).map(this::convertToMatchDTO); // This should be removed
+        return matchDTO.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    // Create a new match and return MatchDTO
+    @PostMapping
+    public ResponseEntity<MatchDTO> createMatch(@RequestBody Match match) {
+        MatchDTO createdMatchDTO = matchService.createMatch(match); // Ensure this returns MatchDTO, not Match
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdMatchDTO);
+    }
+
+    // Delete a match by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMatch(@PathVariable Long id) {
+        matchService.deleteMatch(id);
+        return ResponseEntity.noContent().build();
+    }
+}

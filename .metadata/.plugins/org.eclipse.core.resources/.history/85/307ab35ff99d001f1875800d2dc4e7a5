@@ -1,0 +1,23 @@
+package com.example.ncasports.model;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
+
+@Entity
+public class Tournament {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String location;
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)
+    private List<Match> matches;
+
+    // Getters and Setters
+}

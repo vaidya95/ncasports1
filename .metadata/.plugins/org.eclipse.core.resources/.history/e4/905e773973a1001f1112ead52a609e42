@@ -1,0 +1,84 @@
+package com.cricket.ncasports.controller;
+
+import com.cricket.ncasports.dto.ScoreDTO;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.model.Score;
+import com.cricket.ncasports.repository.MatchRepository;
+import com.cricket.ncasports.repository.ScoreRepository;
+import com.cricket.ncasports.service.ScoreService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/scores")
+public class ScoreController {
+
+    private final ScoreService scoreService;
+    private final SimpMessagingTemplate messagingTemplate;
+    
+    @Autowired
+    private ScoreRepository scoreRepository;
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    public ScoreController(ScoreService scoreService, SimpMessagingTemplate messagingTemplate) {
+        this.scoreService = scoreService;
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    // Create a new score for a match
+    @PostMapping
+    public ResponseEntity<ScoreDTO> createScore(@RequestBody ScoreDTO scoreDTO) {
+        try {
+            ScoreDTO createdScoreDTO = scoreService.createScore(scoreDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdScoreDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    // Update score for an existing match and broadcast to WebSocket clients
+    @PutMapping("/{matchId}")
+    public ResponseEntity<ScoreDTO> updateScore(@PathVariable Long matchId, @RequestBody ScoreDTO scoreDTO) {
+        scoreDTO.setMatchId(matchId);
+        try {
+            ScoreDTO updatedScoreDTO = scoreService.updateScore(scoreDTO);
+            // Broadcast the updated score to all WebSocket clients
+            messagingTemplate.convertAndSend("/topic/score-updates", updatedScoreDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedScoreDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @GetMapping("/{matchId}")
+    public ResponseEntity<ScoreDTO> getScore(@PathVariable Long matchId) {
+        // Check if score exists
+        Score score = scoreRepository.findByMatchId(matchId).orElseGet(() -> {
+            // If no score, create a default score entry
+            Match match = matchRepository.findById(matchId)
+                    .orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+            Score newScore = new Score();
+            newScore.setMatch(match);
+            newScore.setTeamAScore(0);
+            newScore.setTeamBScore(0);
+            newScore.setWinner("");  // No winner by default
+
+            scoreRepository.save(newScore); // Save the default score
+            return newScore;
+        });
+
+        // Convert to DTO and return
+        ScoreDTO scoreDTO = new ScoreDTO(score.getMatch().getId(),
+                                         score.getTeamAScore(),
+                                         score.getTeamBScore(),
+                                         score.getWinner());
+
+        return ResponseEntity.ok(scoreDTO);
+    }
+}

@@ -1,0 +1,22 @@
+package com.cricket.ncasports.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.cricket.ncasports.model.Player;
+import com.cricket.ncasports.service.PlayerService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/players")
+public class PlayerController {
+
+    @Autowired
+    private PlayerService playerService;
+
+    @GetMapping("/findByName/{name}")
+    public List<Player> getPlayersByName(@PathVariable String name) {
+        return playerService.getPlayersByName(name);
+    }
+}
+

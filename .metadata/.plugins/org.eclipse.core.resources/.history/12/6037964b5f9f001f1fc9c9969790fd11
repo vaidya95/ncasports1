@@ -1,0 +1,62 @@
+package com.cricket.ncasports.controller;
+
+import com.cricket.ncasports.dto.ScoreDTO;
+import com.cricket.ncasports.service.ScoreService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/scores")
+public class ScoreController {
+
+    private final ScoreService scoreService;
+    
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    public ScoreController(ScoreService scoreService) {
+        this.scoreService = scoreService;
+    }
+
+    // Create a new score for a match
+    @PostMapping
+    public ResponseEntity<ScoreDTO> createScore(@RequestBody ScoreDTO scoreDTO) {
+        try {
+            ScoreDTO createdScoreDTO = scoreService.createScore(scoreDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdScoreDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping("/update-score")
+    public String updateScore(@RequestParam Long matchId, @RequestBody ScoreDTO score) {
+        messagingTemplate.convertAndSend("/topic/score-updates/" + matchId, score);
+        return "Score updated!";
+    }
+    
+    @PostMapping("/update-score")
+    public String updateScore(@RequestParam String matchId, @RequestParam String score) throws JsonMappingException, JsonProcessingException {
+        ScoreDTO scoreDTO = new ObjectMapper().readValue(score, ScoreDTO.class);
+        messagingTemplate.convertAndSend("/topic/score-updates/" + matchId, scoreDTO);
+        return "Score updated!";
+    }
+    
+    @GetMapping("/{matchId}")
+    public ResponseEntity<ScoreDTO> getScore(@PathVariable Long matchId) {
+        ScoreDTO scoreDTO = scoreService.getScoreByMatchId(matchId);
+        if (scoreDTO != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(scoreDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+}

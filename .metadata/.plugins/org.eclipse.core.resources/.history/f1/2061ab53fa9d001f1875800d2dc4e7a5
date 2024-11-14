@@ -1,0 +1,5 @@
+package com.cricket.ncasports.repository;
+
+public interface MatchRepository {
+
+}

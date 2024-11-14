@@ -1,0 +1,21 @@
+
+package com.cricket.ncasports.config;
+
+import org.springframework.context.annotation.Configuration;
+
+
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic"); // Message broker for broadcasting messages
+        config.setApplicationDestinationPrefixes("/app"); // Prefix for the client
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws").withSockJS(); // WebSocket endpoint
+    }
+}

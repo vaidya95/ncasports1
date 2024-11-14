@@ -1,0 +1,66 @@
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cricket.ncasports.dto.TournamentDTO;
+import com.cricket.ncasports.model.Tournament;
+import com.cricket.ncasports.repository.TournamentRepository;
+
+@Service
+public class TournamentService {
+
+    private final TournamentRepository tournamentRepository;
+
+    @Autowired
+    public TournamentService(TournamentRepository tournamentRepository) {
+        this.tournamentRepository = tournamentRepository;
+    }
+
+    // Method to get all tournaments as DTOs
+    public List<TournamentDTO> getAllTournamentsAsDTO() {
+        return tournamentRepository.findAll().stream()
+                .map(this::convertToTournamentDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Method to get a single tournament by ID as DTO
+    public Optional<TournamentDTO> getTournamentById(Long id) {
+        Optional<Tournament> tournament = tournamentRepository.findById(id);
+        return tournament.map(this::convertToTournamentDTO);
+    }
+
+    // Method to create a new tournament and return as DTO
+    public TournamentDTO createTournament(Tournament tournament) {
+        // Save the tournament entity to the database
+        Tournament savedTournament = tournamentRepository.save(tournament);
+
+        // Convert and return the saved tournament as TournamentDTO
+        return convertToTournamentDTO(savedTournament);
+    }
+
+    // Delete a tournament by ID
+    public void deleteTournament(Long id) {
+        tournamentRepository.deleteById(id);
+    }
+
+    // Convert Tournament entity to TournamentDTO
+    private TournamentDTO convertToTournamentDTO(Tournament tournament) {
+    	TournamentDTO tournamentDTO = new TournamentDTO();
+        tournamentDTO.setId(tournament.getId());
+        tournamentDTO.setName(tournament.getName());
+        tournamentDTO.setLocation(tournament.getLocation());
+        tournamentDTO.setStartDate(tournament.getStartDate());
+        tournamentDTO.setEndDate(tournament.getEndDate());
+
+        // Map the matches if necessary
+        List<MatchDTO> matchDTOs = tournament.getMatches().stream()
+                .map(match -> convertToMatchDTO(match)) // create a convertToMatchDTO method if necessary
+                .collect(Collectors.toList());
+        tournamentDTO.setMatches(matchDTOs);
+
+        return tournamentDTO;
+    }
+}

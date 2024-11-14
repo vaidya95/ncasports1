@@ -1,0 +1,21 @@
+package com.example.ncasports.model;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Score {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private int teamAScore;
+    private int teamBScore;
+    private String winner;
+
+    @OneToOne
+    @JoinColumn(name = "match_id")
+    private Match match;
+
+    // Getters and Setters
+}

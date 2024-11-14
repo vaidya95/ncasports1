@@ -1,0 +1,31 @@
+package com.cricket.ncasports.model;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Player {
+	
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+ 
+    
+    
+    
+	public Player(String name) {
+		super();
+		this.name = name;
+	}
+	
+	
+
+	public Player() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+
+
+}

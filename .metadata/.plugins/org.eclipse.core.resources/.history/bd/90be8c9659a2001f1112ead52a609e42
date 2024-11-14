@@ -1,0 +1,97 @@
+package com.cricket.ncasports.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cricket.ncasports.dto.MatchDTO;
+import com.cricket.ncasports.dto.PlayerRoleDTO;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.model.Player;
+import com.cricket.ncasports.model.PlayerRole;
+import com.cricket.ncasports.model.Tournament;
+import com.cricket.ncasports.repository.MatchRepository;
+import com.cricket.ncasports.repository.PlayerRepository;
+import com.cricket.ncasports.repository.PlayerRoleRepository;
+
+@Service
+public class MatchService {
+
+    private final MatchRepository matchRepository;
+    private final PlayerRepository playerRepository;
+    private final PlayerRoleRepository playerRoleRepository;
+
+    @Autowired
+    public MatchService(MatchRepository matchRepository, PlayerRepository playerRepository, PlayerRoleRepository playerRoleRepository) {
+        this.matchRepository = matchRepository;
+        this.playerRepository = playerRepository;
+        this.playerRoleRepository = playerRoleRepository;
+    }
+
+    public MatchDTO createMatch(MatchDTO matchDTO) {
+        Match match = new Match();
+        match.setTeamA(matchDTO.getTeamA());
+        match.setTeamB(matchDTO.getTeamB());
+        match.setScheduledDate(matchDTO.getScheduledDate());
+
+        // Set Tournament
+        Tournament tournament = tournamentRepository.findById(matchDTO.getTournamentId())
+            .orElseThrow(() -> new IllegalArgumentException("Tournament not found"));
+        match.setTournament(tournament);
+
+        // Set Toss Information
+        match.setTossWinner(matchDTO.getTossWinner());
+        match.setTossDecision(matchDTO.getTossDecision());
+
+        // Convert Player Roles
+        List<PlayerRole> playerRoles = new ArrayList<>();
+        for (PlayerRoleDTO playerRoleDTO : matchDTO.getPlayerRoles()) {
+            Player player = playerRepository.findById(playerRoleDTO.getPlayerId())
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+            
+            // Convert string to Role enum
+            Role role = Role.valueOf(playerRoleDTO.getRole());  // Convert string to Role enum
+
+            PlayerRole playerRole = new PlayerRole();
+            playerRole.setPlayer(player);
+            playerRole.setRole(role);  // Set the role
+            playerRole.setMatch(match);
+            playerRoles.add(playerRole);
+        }
+        match.setPlayerRoles(playerRoles);
+
+        match = matchRepository.save(match);
+        return convertToMatchDTO(match);
+    }
+
+
+    // Convert Match entity to MatchDTO
+    public MatchDTO convertToMatchDTO(Match match) {
+        MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setId(match.getId());
+        matchDTO.setTeamA(match.getTeamA());
+        matchDTO.setTeamB(match.getTeamB());
+        matchDTO.setScheduledDate(match.getScheduledDate());
+        matchDTO.setTossWinner(match.getTossWinner());
+        matchDTO.setTossDecision(match.getTossDecision());
+        matchDTO.setTournamentId(match.getTournament().getId());
+        matchDTO.setTournamentName(match.getTournament().getName());
+
+        // Convert player roles to DTO
+        List<PlayerRoleDTO> playerRoleDTOs = match.getPlayerRoles().stream()
+                .map(playerRole -> {
+                    PlayerRoleDTO dto = new PlayerRoleDTO();
+                    dto.setPlayerId(playerRole.getPlayer().getId());
+                    dto.setPlayerName(playerRole.getPlayer().getName());
+                    dto.setRole(playerRole.getRole());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        matchDTO.setPlayerRoles(playerRoleDTOs);
+
+        return matchDTO;
+    }
+}

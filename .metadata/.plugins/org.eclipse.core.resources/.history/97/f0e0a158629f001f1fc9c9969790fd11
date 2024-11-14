@@ -1,0 +1,21 @@
+package com.cricket.ncasports.dto;
+
+public class ScoreDTO {
+	private Long matchId;
+    private String teamA;
+    private String teamB;
+    private int teamAScore;
+    private int teamBScore;
+    private String winner;
+
+    // Constructor
+    public ScoreDTO(Long matchId, String teamA, String teamB, int teamAScore, int teamBScore, String winner) {
+        this.matchId = matchId;
+        this.teamA = teamA;
+        this.teamB = teamB;
+        this.teamAScore = teamAScore;
+        this.teamBScore = teamBScore;
+        this.winner = winner;
+    }
+    
+}

@@ -1,0 +1,100 @@
+package com.cricket.ncasports.model;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Score {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private int teamAScore;
+    private int teamBScore;
+    private String winner;
+    
+    private int teamAWickets;
+    private int teamBWickets;
+    @Column(name = "teamAover")
+    private double teamAOver;
+    @Column(name = "teamBover")
+    private double teamBOver;
+
+    @OneToOne
+    @JoinColumn(name = "match_id")
+    private Match match;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public int getTeamAScore() {
+		return teamAScore;
+	}
+
+	public void setTeamAScore(int teamAScore) {
+		this.teamAScore = teamAScore;
+	}
+
+	public int getTeamBScore() {
+		return teamBScore;
+	}
+
+	public void setTeamBScore(int teamBScore) {
+		this.teamBScore = teamBScore;
+	}
+
+	public String getWinner() {
+		return winner;
+	}
+
+	public void setWinner(String winner) {
+		this.winner = winner;
+	}
+
+	public Match getMatch() {
+		return match;
+	}
+
+	public void setMatch(Match match) {
+		this.match = match;
+	}
+
+	public int getTeamAWickets() {
+		return teamAWickets;
+	}
+
+	public void setTeamAWickets(int teamAWickets) {
+		this.teamAWickets = teamAWickets;
+	}
+
+	public int getTeamBWickets() {
+		return teamBWickets;
+	}
+
+	public void setTeamBWickets(int teamBWickets) {
+		this.teamBWickets = teamBWickets;
+	}
+
+	public double getTeamAOver() {
+		return teamAOver;
+	}
+
+	public void setTeamAOver(double teamAOver) {
+		this.teamAOver = teamAOver;
+	}
+
+	public double getTeamBOver() {
+		return teamBOver;
+	}
+
+	public void setTeamBOver(double teamBOver) {
+		this.teamBOver = teamBOver;
+	}
+
+    
+}

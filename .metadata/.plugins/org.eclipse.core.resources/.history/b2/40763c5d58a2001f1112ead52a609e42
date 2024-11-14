@@ -1,0 +1,7 @@
+package com.cricket.ncasports.dto;
+
+public class PlayerRoleDTO {
+	private Long playerId;
+    private String playerName;
+    private String role;
+}

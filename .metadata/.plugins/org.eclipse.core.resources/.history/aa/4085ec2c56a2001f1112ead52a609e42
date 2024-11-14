@@ -1,0 +1,5 @@
+package com.cricket.ncasports.model;
+
+public enum Role {
+
+}

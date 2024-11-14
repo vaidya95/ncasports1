@@ -1,0 +1,10 @@
+package com.cricket.ncasports.repository;
+
+import com.cricket.ncasports.model.Player;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface PlayerRepository extends JpaRepository<Player, Long> {
+
+    List<Player> findByNameIn(List<String> names);  // Fetch players by their names
+}

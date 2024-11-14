@@ -1,0 +1,52 @@
+package com.cricket.ncasports.service;
+
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.repository.MatchRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class MatchService {
+
+    private final MatchRepository matchRepository;
+
+    @Autowired
+    public MatchService(MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
+    }
+
+    public List<Match> getAllMatches() {
+        return matchRepository.findAll();
+    }
+
+    public Optional<Match> getMatchById(Long id) {
+        return matchRepository.findById(id);
+    }
+
+    public Match createMatch(Match match) {
+        return matchRepository.save(match);
+    }
+
+    public void deleteMatch(Long id) {
+        matchRepository.deleteById(id);
+    }
+    
+    public List<MatchDTO> getAllMatchesAsDTO() {
+        return matchRepository.findAll().stream()
+            .map(this::convertToMatchDTO)
+            .collect(Collectors.toList());
+    }
+
+    private MatchDTO convertToMatchDTO(Match match) {
+        MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setId(match.getId());
+        matchDTO.setTeamA(match.getTeamA());
+        matchDTO.setTeamB(match.getTeamB());
+        matchDTO.setScheduledDate(match.getScheduledDate());
+        matchDTO.setTournamentId(match.getTournament().getId());
+        matchDTO.setTournamentName(match.getTournament().getName());
+        return matchDTO;
+}

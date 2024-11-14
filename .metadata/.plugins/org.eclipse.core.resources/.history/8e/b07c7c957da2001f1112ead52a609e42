@@ -1,0 +1,98 @@
+package com.cricket.ncasports.model;
+
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "cricket_match")
+@JsonIgnoreProperties("tournament")
+public class Match {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String teamA;
+    private String teamB;
+    private LocalDateTime scheduledDate;
+
+    @ManyToOne
+    @JoinColumn(name = "tournament_id")
+    @JsonBackReference
+    private Tournament tournament;
+
+    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+    private Score score;
+
+    // Player roles for each team (Batting, Bowling)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "match")
+    private List<PlayerRole> playerRoles;  // Dynamically store player roles for each team
+
+    private String tossWinner;
+    private String tossDecision;
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getTeamA() {
+		return teamA;
+	}
+	public void setTeamA(String teamA) {
+		this.teamA = teamA;
+	}
+	public String getTeamB() {
+		return teamB;
+	}
+	public void setTeamB(String teamB) {
+		this.teamB = teamB;
+	}
+	public LocalDateTime getScheduledDate() {
+		return scheduledDate;
+	}
+	public void setScheduledDate(LocalDateTime scheduledDate) {
+		this.scheduledDate = scheduledDate;
+	}
+	public Tournament getTournament() {
+		return tournament;
+	}
+	public void setTournament(Tournament tournament) {
+		this.tournament = tournament;
+	}
+	public Score getScore() {
+		return score;
+	}
+	public void setScore(Score score) {
+		this.score = score;
+	}
+	public List<PlayerRole> getPlayerRoles() {
+		return playerRoles;
+	}
+	public void setPlayerRoles(List<PlayerRole> playerRoles) {
+		this.playerRoles = playerRoles;
+	}
+	public String getTossWinner() {
+		return tossWinner;
+	}
+	public void setTossWinner(String tossWinner) {
+		this.tossWinner = tossWinner;
+	}
+	public String getTossDecision() {
+		return tossDecision;
+	}
+	public void setTossDecision(String tossDecision) {
+		this.tossDecision = tossDecision;
+	}
+
+   
+    
+    
+}

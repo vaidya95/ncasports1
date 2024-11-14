@@ -1,0 +1,65 @@
+// package com.cricket.ncasports.dto;
+
+import java.time.LocalDateTime;
+
+public class MatchDTO {
+    private Long id;
+    private String teamA;
+    private String teamB;
+    private LocalDateTime scheduledDate;
+    private Long tournamentId;
+    private String tournamentName;
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getTeamA() {
+		return teamA;
+	}
+	public void setTeamA(String teamA) {
+		this.teamA = teamA;
+	}
+	public String getTeamB() {
+		return teamB;
+	}
+	public void setTeamB(String teamB) {
+		this.teamB = teamB;
+	}
+	public LocalDateTime getScheduledDate() {
+		return scheduledDate;
+	}
+	public void setScheduledDate(LocalDateTime scheduledDate) {
+		this.scheduledDate = scheduledDate;
+	}
+	public Long getTournamentId() {
+		return tournamentId;
+	}
+	public void setTournamentId(Long tournamentId) {
+		this.tournamentId = tournamentId;
+	}
+	public String getTournamentName() {
+		return tournamentName;
+	}
+	public void setTournamentName(String tournamentName) {
+		this.tournamentName = tournamentName;
+	}
+	public MatchDTO(Long id, String teamA, String teamB, LocalDateTime scheduledDate, Long tournamentId,
+			String tournamentName) {
+		super();
+		this.id = id;
+		this.teamA = teamA;
+		this.teamB = teamB;
+		this.scheduledDate = scheduledDate;
+		this.tournamentId = tournamentId;
+		this.tournamentName = tournamentName;
+	}
+	public MatchDTO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+    // Constructors, Getters, and Setters
+    
+}

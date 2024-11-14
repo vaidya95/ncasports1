@@ -1,0 +1,110 @@
+package com.cricket.ncasports.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class MatchDTO {
+
+    private Long id;
+    private String teamA;
+    private String teamB;
+    private LocalDateTime scheduledDate;
+    private Long tournamentId;  // Tournament ID from the Match entity
+    private String tournamentName; // Tournament Name from the Match entity
+    private List<String> teamABatsmen;  // Batting lineup for Team A
+    private List<String> teamBBatsmen;  // Batting lineup for Team B
+    private List<String> teamABowlers; // Bowling lineup for Team A
+    private List<String> teamBBowlers; // Bowling lineup for Team B
+    private String tossWinner;
+
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTeamA() {
+        return teamA;
+    }
+
+    public void setTeamA(String teamA) {
+        this.teamA = teamA;
+    }
+
+    public String getTeamB() {
+        return teamB;
+    }
+
+    public void setTeamB(String teamB) {
+        this.teamB = teamB;
+    }
+
+    public LocalDateTime getScheduledDate() {
+        return scheduledDate;
+    }
+
+    public void setScheduledDate(LocalDateTime scheduledDate) {
+        this.scheduledDate = scheduledDate;
+    }
+
+    public Long getTournamentId() {
+        return tournamentId;
+    }
+
+    public void setTournamentId(Long tournamentId) {
+        this.tournamentId = tournamentId;
+    }
+
+    public String getTournamentName() {
+        return tournamentName;
+    }
+
+    public void setTournamentName(String tournamentName) {
+        this.tournamentName = tournamentName;
+    }
+
+	public List<String> getTeamABatsmen() {
+		return teamABatsmen;
+	}
+
+	public void setTeamABatsmen(List<String> teamABatsmen) {
+		this.teamABatsmen = teamABatsmen;
+	}
+
+	public List<String> getTeamBBatsmen() {
+		return teamBBatsmen;
+	}
+
+	public void setTeamBBatsmen(List<String> teamBBatsmen) {
+		this.teamBBatsmen = teamBBatsmen;
+	}
+
+	public List<String> getTeamABowlers() {
+		return teamABowlers;
+	}
+
+	public void setTeamABowlers(List<String> teamABowlers) {
+		this.teamABowlers = teamABowlers;
+	}
+
+	public List<String> getTeamBBowlers() {
+		return teamBBowlers;
+	}
+
+	public void setTeamBBowlers(List<String> teamBBowlers) {
+		this.teamBBowlers = teamBBowlers;
+	}
+
+	public String getTossWinner() {
+		return tossWinner;
+	}
+
+	public void setTossWinner(String tossWinner) {
+		this.tossWinner = tossWinner;
+	}
+	
+    
+}

@@ -1,0 +1,8 @@
+package com.cricket.ncasports.repository;
+
+import com.example.ncasports.model.Score;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ScoreRepository extends JpaRepository<Score, Long> {
+    // You can define custom queries or methods here if needed
+}

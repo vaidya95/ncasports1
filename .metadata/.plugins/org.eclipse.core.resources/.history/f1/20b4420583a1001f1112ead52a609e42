@@ -1,0 +1,76 @@
+package com.cricket.ncasports.dto;
+
+import com.cricket.ncasports.model.Score;
+
+public class ScoreDTO {
+
+    private Long matchId;
+    private String teamA;
+    private String teamB;
+    private int teamAScore;
+    private int teamBScore;
+    private String winner;
+
+    public ScoreDTO() {
+        super();
+    }
+    
+    public ScoreDTO(Long matchId, String teamA, String teamB, int teamAScore, int teamBScore, String winner) {
+        this.matchId = matchId;
+        this.teamA = teamA;
+        this.teamB = teamB;
+        this.teamAScore = teamAScore;
+        this.teamBScore = teamBScore;
+        this.winner = winner;
+    }
+    
+
+    // Getters and setters
+    public Long getMatchId() {
+        return matchId;
+    }
+
+    public void setMatchId(Long matchId) {
+        this.matchId = matchId;
+    }
+
+    public String getTeamA() {
+        return teamA;
+    }
+
+    public void setTeamA(String teamA) {
+        this.teamA = teamA;
+    }
+
+    public String getTeamB() {
+        return teamB;
+    }
+
+    public void setTeamB(String teamB) {
+        this.teamB = teamB;
+    }
+
+    public int getTeamAScore() {
+        return teamAScore;
+    }
+
+    public void setTeamAScore(int teamAScore) {
+        this.teamAScore = teamAScore;
+    }
+
+    public int getTeamBScore() {
+        return teamBScore;
+    }
+
+    public void setTeamBScore(int teamBScore) {
+        this.teamBScore = teamBScore;
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
+}

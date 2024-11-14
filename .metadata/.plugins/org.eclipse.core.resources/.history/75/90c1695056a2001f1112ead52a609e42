@@ -1,0 +1,154 @@
+package com.cricket.ncasports.model;
+
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "cricket_match")
+@JsonIgnoreProperties("tournament")
+public class Match {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String teamA;
+    private String teamB;
+    private LocalDateTime scheduledDate;
+
+    @ManyToOne
+    @JoinColumn(name = "tournament_id")
+    @JsonBackReference
+    private Tournament tournament;
+
+    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+    private Score score;
+    
+    
+    
+    // Batting and bowling lineup for each team (selected after toss)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id")
+    private List<Player> teamABatsmen;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id")
+    private List<Player> teamBBatsmen;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id")
+    private List<Player> teamABowlers;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "match_id")
+    private List<Player> teamBBowlers;
+
+    // Toss info (who won the toss and what decision they made)
+    private String tossWinner;  // Team that won the toss
+    private String tossDecision;  // Whether the team chose to bat or bowl first
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTeamA() {
+		return teamA;
+	}
+
+	public void setTeamA(String teamA) {
+		this.teamA = teamA;
+	}
+
+	public String getTeamB() {
+		return teamB;
+	}
+
+	public void setTeamB(String teamB) {
+		this.teamB = teamB;
+	}
+
+	public LocalDateTime getScheduledDate() {
+		return scheduledDate;
+	}
+
+	public void setScheduledDate(LocalDateTime scheduledDate) {
+		this.scheduledDate = scheduledDate;
+	}
+
+	public Tournament getTournament() {
+		return tournament;
+	}
+
+	public void setTournament(Tournament tournament) {
+		this.tournament = tournament;
+	}
+
+	public Score getScore() {
+		return score;
+	}
+
+	public void setScore(Score score) {
+		this.score = score;
+	}
+
+	public List<Player> getTeamABatsmen() {
+		return teamABatsmen;
+	}
+
+	public void setTeamABatsmen(List<Player> teamABatsmen) {
+		this.teamABatsmen = teamABatsmen;
+	}
+
+	public List<Player> getTeamBBatsmen() {
+		return teamBBatsmen;
+	}
+
+	public void setTeamBBatsmen(List<Player> teamBBatsmen) {
+		this.teamBBatsmen = teamBBatsmen;
+	}
+
+	public List<Player> getTeamABowlers() {
+		return teamABowlers;
+	}
+
+	public void setTeamABowlers(List<Player> teamABowlers) {
+		this.teamABowlers = teamABowlers;
+	}
+
+	public List<Player> getTeamBBowlers() {
+		return teamBBowlers;
+	}
+
+	public void setTeamBBowlers(List<Player> teamBBowlers) {
+		this.teamBBowlers = teamBBowlers;
+	}
+
+	public String getTossWinner() {
+		return tossWinner;
+	}
+
+	public void setTossWinner(String tossWinner) {
+		this.tossWinner = tossWinner;
+	}
+
+	public String getTossDecision() {
+		return tossDecision;
+	}
+
+	public void setTossDecision(String tossDecision) {
+		this.tossDecision = tossDecision;
+	}
+
+  
+}

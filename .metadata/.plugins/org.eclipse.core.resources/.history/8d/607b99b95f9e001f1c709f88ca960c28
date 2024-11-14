@@ -1,0 +1,109 @@
+package com.cricket.ncasports.service;
+
+import com.cricket.ncasports.dto.MatchDTO;
+import com.cricket.ncasports.dto.TournamentDTO;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.model.Tournament;
+import com.cricket.ncasports.repository.MatchRepository;
+import com.cricket.ncasports.repository.TournamentRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class MatchService {
+
+    private final MatchRepository matchRepository;
+    private final TournamentRepository tournamentRepository;
+
+    @Autowired
+    public MatchService(MatchRepository matchRepository, TournamentRepository tournamentRepository) {
+        this.matchRepository = matchRepository;
+        this.tournamentRepository = tournamentRepository; // Inject the TournamentRepository
+    }
+
+    /**
+     * Get all matches as MatchDTO
+     * 
+     * @return List of MatchDTO
+     */
+    public List<MatchDTO> getAllMatchesAsDTO() {
+        return matchRepository.findAll().stream()
+                .map(this::convertToMatchDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get match by ID
+     * 
+     * @param id Match ID
+     * @return MatchDTO if found, Optional.empty() otherwise
+     */
+    public Optional<MatchDTO> getMatchById(Long id) {
+        Optional<Match> match = matchRepository.findById(id);
+        return match.map(this::convertToMatchDTO);
+    }
+
+    /**
+     * Create a new match and return MatchDTO
+     * 
+     * @param match Match entity to create
+     * @return Created match as MatchDTO
+     */
+    public MatchDTO createMatch(Match match) {
+    	// Ensure that the tournament is not null
+        if (match.getTournament() == null || match.getTournament().getId() == null) {
+            throw new RuntimeException("Tournament is not specified for the match");
+        }
+
+        // Fetch the full Tournament object from the database
+        Tournament tournament = tournamentRepository.findById(match.getTournament().getId())
+                .orElseThrow(() -> new RuntimeException("Tournament not found"));
+
+        // Set the fetched Tournament object to the match
+        match.setTournament(tournament);
+
+        // Save the match entity to the database
+        Match savedMatch = matchRepository.save(match);
+
+        // Convert the saved match to MatchDTO and return it
+        return convertToMatchDTO(savedMatch);
+    }
+
+    /**
+     * Delete match by ID
+     * 
+     * @param id Match ID
+     */
+    public void deleteMatch(Long id) {
+        matchRepository.deleteById(id);
+    }
+
+    /**
+     * Convert Match entity to MatchDTO
+     * 
+     * @param match Match entity
+     * @return MatchDTO
+     */
+    private MatchDTO convertToMatchDTO(Match match) {
+    	MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setId(match.getId());
+        matchDTO.setTeamA(match.getTeamA());
+        matchDTO.setTeamB(match.getTeamB());
+        matchDTO.setScheduledDate(match.getScheduledDate());
+
+        // Set the tournamentId and tournamentName from the Tournament object
+        Tournament tournament = match.getTournament();
+        matchDTO.setTournamentId(tournament.getId());
+        matchDTO.setTournamentName(tournament.getName());
+
+        
+
+        return matchDTO;
+    }
+
+}

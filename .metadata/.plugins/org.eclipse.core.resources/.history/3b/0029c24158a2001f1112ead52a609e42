@@ -1,0 +1,22 @@
+package com.cricket.ncasports.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class MatchDTO {
+
+	private Long id;
+    private String teamA;
+    private String teamB;
+    private LocalDateTime scheduledDate;
+    private Long tournamentId;
+    private String tournamentName;
+    
+    private List<Long> teamABatsmen;
+    private List<Long> teamBBatsmen;
+    private List<Long> teamABowlers;
+    private List<Long> teamBBowlers;
+
+    private String tossWinner;
+    private String tossDecision;
+}

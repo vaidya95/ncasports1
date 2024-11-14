@@ -1,0 +1,51 @@
+package com.cricket.ncasports.controller;
+
+import com.cricket.ncasports.model.Tournament;
+import com.cricket.ncasports.service.TournamentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/tournaments")
+public class TournamentController {
+
+    private final TournamentService tournamentService;
+
+    @Autowired
+    public TournamentController(TournamentService tournamentService) {
+        this.tournamentService = tournamentService;
+    }
+
+    // Get all tournaments
+    @GetMapping
+    public List<Tournament> getAllTournaments() {
+        return tournamentService.getAllTournaments();
+    }
+
+    // Get tournament by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
+        Optional<Tournament> tournament = tournamentService.getTournamentById(id);
+        return tournament.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    // Create a new tournament
+    @PostMapping
+    public ResponseEntity<Tournament> createTournament(@RequestBody Tournament tournament) {
+        Tournament createdTournament = tournamentService.createTournament(tournament);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTournament);
+    }
+
+    // Delete a tournament by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTournament(@PathVariable Long id) {
+        tournamentService.deleteTournament(id);
+        return ResponseEntity.noContent().build();
+    }
+}

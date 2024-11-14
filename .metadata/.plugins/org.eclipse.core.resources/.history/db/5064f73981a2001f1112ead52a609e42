@@ -1,0 +1,20 @@
+package com.cricket.ncasports.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.cricket.ncasports.model.Player;
+import com.cricket.ncasports.repository.PlayerRepository;
+
+import java.util.List;
+
+@Service
+public class PlayerService {
+
+    @Autowired
+    private PlayerRepository playerRepository;
+
+    // Fetch players by name
+    public List<Player> getPlayersByName(String name) {
+        return playerRepository.findByName(name);
+    }
+}

@@ -1,0 +1,30 @@
+package com.cricket.ncasports.websockets;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.TextMessage;
+
+@Component
+public class ScoreWebSocketHandler extends TextWebSocketHandler {
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public ScoreWebSocketHandler(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    @Override
+    public void handleTextMessage(WebSocketSession session, TextMessage message) {
+        // Handle the message from WebSocket client here and send updates
+        // For instance, updating the score for a particular match
+        String matchId = message.getPayload();  // Assuming matchId is sent in the message
+        
+        // Fetch the score based on matchId and send it back
+        // For this example, sending a static message back:
+        String score = "Team A 100/3, Team B 98/2";  // Replace with actual score from DB
+        
+        messagingTemplate.convertAndSend("/topic/score-updates/" + matchId, score); // Broadcasting score updates
+    }
+}

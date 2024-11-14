@@ -1,0 +1,8 @@
+package com.cricket.ncasports.repository;
+
+import com.example.ncasports.model.Match;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MatchRepository extends JpaRepository<Match, Long> {
+    // Custom queries or methods can be added here as needed
+}

@@ -1,0 +1,5 @@
+package com.cricket.ncasports.repository;
+
+@Repository
+public interface PlayerRoleRepository extends JpaRepository<PlayerRole, Long> {
+}

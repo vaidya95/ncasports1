@@ -1,0 +1,99 @@
+package com.cricket.ncasports.service;
+
+import com.cricket.ncasports.dto.ScoreDTO;
+import com.cricket.ncasports.mapper.ScoreMapper;
+import com.cricket.ncasports.model.Match;
+import com.cricket.ncasports.model.Score;
+import com.cricket.ncasports.repository.MatchRepository;
+import com.cricket.ncasports.repository.ScoreRepository;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ScoreService {
+
+    private final MatchRepository matchRepository;
+    private final ScoreRepository scoreRepository;
+    private final ScoreUpdateService scoreUpdateService;
+    private final ScoreMapper scoreMapper;
+    @Autowired
+    public ScoreService(MatchRepository matchRepository, ScoreRepository scoreRepository, ScoreUpdateService scoreUpdateService,ScoreMapper scoreMapper) {
+        this.matchRepository = matchRepository;
+        this.scoreRepository = scoreRepository;
+        this.scoreUpdateService = scoreUpdateService;
+        this.scoreMapper = scoreMapper;
+    }
+    
+    public ScoreDTO getScoreByMatchId(Long matchId) {
+        Optional<Score> optionalScore = scoreRepository.findByMatchId(matchId);
+
+        // Check if score exists, if so return the DTO with required data, else return null.
+        if (optionalScore.isPresent()) {
+            Score score = optionalScore.get();
+            // Convert the Score entity to a ScoreDTO
+            return new ScoreDTO(
+                    score.getMatch().getId(),
+                    score.getMatch().getTeamA(),
+                    score.getMatch().getTeamB(),
+                    score.getTeamAScore(),
+                    score.getTeamBScore(),
+                    score.getWinner()
+            );
+        } else {
+            // If the score doesn't exist for the match, return null
+            return null;
+        }
+    }
+
+    public ScoreDTO createScore(ScoreDTO scoreDTO) {
+        Match match = matchRepository.findById(scoreDTO.getMatchId()).orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+        Score score = new Score();
+        score.setMatch(match);
+        score.setTeamAScore(scoreDTO.getTeamAScore());
+        score.setTeamBScore(scoreDTO.getTeamBScore());
+        score.setWinner(scoreDTO.getWinner());
+
+        score = scoreRepository.save(score);
+
+        ScoreDTO createdScoreDTO = convertToScoreDTO(score);
+
+        // Send the score update to WebSocket topic
+        scoreUpdateService.sendScoreUpdate(createdScoreDTO);
+
+        return createdScoreDTO;
+    }
+
+    public ScoreDTO updateScore(ScoreDTO scoreDTO) {
+        Match match = matchRepository.findById(scoreDTO.getMatchId()).orElseThrow(() -> new IllegalArgumentException("Match not found"));
+
+        Score score = scoreRepository.findByMatch(match).orElseThrow(() -> new IllegalArgumentException("Score not found"));
+
+        score.setTeamAScore(scoreDTO.getTeamAScore());
+        score.setTeamBScore(scoreDTO.getTeamBScore());
+        score.setWinner(scoreDTO.getWinner());
+
+        score = scoreRepository.save(score);
+
+        ScoreDTO updatedScoreDTO = convertToScoreDTO(score);
+
+        // Send the score update to WebSocket topic
+        scoreUpdateService.sendScoreUpdate(updatedScoreDTO);
+
+        return updatedScoreDTO;
+    }
+
+    private ScoreDTO convertToScoreDTO(Score score) {
+        ScoreDTO scoreDTO = new ScoreDTO();
+        scoreDTO.setMatchId(score.getMatch().getId());
+        scoreDTO.setTeamAScore(score.getTeamAScore());
+        scoreDTO.setTeamBScore(score.getTeamBScore());
+        scoreDTO.setWinner(score.getWinner());
+        return scoreDTO;
+    }
+
+   
+}

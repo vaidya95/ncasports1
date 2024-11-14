@@ -1,0 +1,12 @@
+package com.cricket.ncasports.dto;
+
+import com.cricket.ncasports.model.Role;
+
+public class PlayerDTO {
+	    private Long id; 
+	    private String playerName;
+	    private Role role;
+	    
+	    
+	    
+}

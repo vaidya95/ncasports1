@@ -1,0 +1,27 @@
+package com.example.ncasports.model;
+
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Match {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String teamA;
+    private String teamB;
+    private LocalDateTime scheduledDate;
+
+    @ManyToOne
+    @JoinColumn(name = "tournament_id")
+    private Tournament tournament;
+
+    @OneToOne(mappedBy = "match", cascade = CascadeType.ALL)
+    private Score score;
+
+    // Getters and Setters
+}
